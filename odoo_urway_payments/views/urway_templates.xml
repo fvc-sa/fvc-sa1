@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="urway_form">
+            <input type="hidden" name="data_set" t-att-data-action-url="tx_url" data-remove-me=""/>
+            <input type='hidden' name='tx_id' t-att-value='tx_id'/>
+        </template>
+
+        <template id="redirect_fail_page" name="URWAY Failure" inherit_id="website.layout">
+            <xpath expr="//div[@id='wrapwrap']/main" position="inside">
+                <div t-if="urway_err == True" class="container mt72">
+                    <h1>Payment Response:</h1>
+                    <div class="alert alert-danger mt32" role="alert">
+                        <strong>ERR <t t-raw="error_code"></t> :
+                            <t t-raw="message"></t>
+                        </strong>
+                    </div>
+                    <button class="btn btn-lg btn-primary tryagain mt32" onclick=" setTimeout(function(){window.location.href = '/shop/payment';}, 500)">TRY AGAIN</button>
+                </div>
+            </xpath>
+        </template>
+
+        <template id="assets_frontend" inherit_id="web.assets_frontend">
+            <xpath expr="script[last()]" position="after">
+
+            </xpath>
+        </template>
+    </data>
+</odoo>

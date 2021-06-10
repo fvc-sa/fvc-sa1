@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="payment_acquirer_urway" model="payment.acquirer">
+            <field name="name">URWAY Payment Gateway</field>
+            <field name="image_128" type="base64" file="odoo_urway_payments/static/src/img/urway.png" />
+            <field name="provider">urway</field>
+            <field name="company_id" ref="base.main_company" />
+            <field name="view_template_id" ref="urway_form" />
+        </record>
+    </data>
+</odoo>
