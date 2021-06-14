@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+                id="action_report_by_supplier"
+                string="Sale Report By Vendor"
+                model="sale.supplier.report"
+                report_type="qweb-pdf"
+                file="km_sales_report_by_supplier.sale_report_view"
+                name="km_sales_report_by_supplier.sale_report_view"
+        />
+    </data>
+</odoo>
