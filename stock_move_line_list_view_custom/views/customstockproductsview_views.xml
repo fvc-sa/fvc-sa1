@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+		<record id="view_stock_location_form" model="ir.ui.view">
+			<field name="name">stock.move.line.list.view.custom.stock.location</field>
+			<field name="model">stock.location</field>
+			<field name="inherit_id" ref="stock.view_location_form"/>
+			<field name="groups_id" eval="[(4,ref('stock.group_stock_multi_locations'))]"/>
+			<field name="arch" type="xml">
+				<field name="active" position="after">
+                    <field name ="minus_values" string="Negative Quantity"/>
+				</field>
+			</field>
+		</record>
+        <record id="stock_view_move_line_tree" model="ir.ui.view">
+			<field name="name">stock.move.line.list.view.custom.stock.move.line.tree</field>
+			<field name="model">stock.move.line</field>
+			<field name="inherit_id" ref="stock.view_move_line_tree"/>
+			<field name="groups_id" eval="[(4,ref('stock.group_stock_multi_locations'))]"/>
+			<field name="arch" type="xml">
+                <field name="qty_done" position="after">
+                    <field name="real_qty"  string="Real Quantity "  />
+                </field>
+			</field>
+		</record>
+
+
+	</data>
+</odoo>
