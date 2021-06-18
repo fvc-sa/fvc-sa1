@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_report_pos_order_custom" model="ir.ui.view">
+            <field name="name">salereport.pos.order.pivot</field>
+            <field name="model">salereport.pos.order</field>
+            <field name="arch" type="xml">
+               <pivot string="تقرير مبيعات" disable_linking="True" sample="1">
+                   <field name="product_id" string="الصنف" type="row"/>
+                   <field name="company_id" string="الشركة"  type="col"/>
+                   <field name="pricewithouttax" type="measure" string="السعر قبل الضريبة"/>
+                   <field name="pricewithtax" type="measure" string="السعر بعد الضريبة"/>
+                   <field name="product_qty" string="كمية المنتج المباع" type="measure"/>
+                   <field name="discount"  type="measure" string="نسبة الخصم %"/>
+                   <field name="total_discount"  type="measure" string="مبلغ الخصم"/>
+                   <field name="order_id" string="عدد الفواتير" type="measure"/>
+                   <field name="price_total" string="سعر البيع الفعلي" type="measure"/>
+               </pivot>
+            </field>
+        </record>
+
+
+    <record id="action_orders_lines" model="ir.actions.act_window">
+            <field name="name"> Order Reports</field>
+            <field name="res_model">salereport.pos.order</field>
+            <field name="view_mode">pivot</field>
+            <field name="search_view_id" ref="reports_analytics.view_report_pos_order_filters"/>
+            <field name="context">{'group_by_no_leaf':1,'group_by':[]}</field>
+        </record>
+
+    <menuitem id="sale_order_line_menu" name="Pos Sales Order Reports" action="action_orders_lines" parent="point_of_sale.menu_point_rep" sequence="2"/>
+
+</odoo>

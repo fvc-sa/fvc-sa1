@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_report_pos_order_filters" model="ir.ui.view">
+        <field name="name">salereport.pos.order.pivot</field>
+        <field name="model">salereport.pos.order</field>
+        <field name="arch" type="xml">
+            <search string="test">
+                <field name="date"/>
+                <field name="product_id"/>
+                <filter name="filter_date" date="date"/>
+                <field name="partner_id"/>
+                <field name="product_categ_id"/>
+                <field name="config_id"/>
+                <field name="pos_categ_id"/>
+                <group expand="1" string="Group By">
+                    <filter string="الفئة" name="product_category" context="{'group_by':'product_categ_id'}"/>
+                    <filter string="العميل" name="partner" context="{'group_by':'partner_id'}" />
+                    <filter string="نقطة البيع" name="pos" context="{'group_by':'config_id'}" />
+                    <filter string="الفئة في نقطة البيع" name="pos_categ" context="{'group_by':'pos_categ_id'}" />
+                    <filter string="التاريخ" name="order_month" context="{'group_by':'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>
