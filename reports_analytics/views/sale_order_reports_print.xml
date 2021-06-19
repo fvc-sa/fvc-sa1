@@ -27,6 +27,7 @@
             <field name="context">{'group_by_no_leaf':1,'group_by':[]}</field>
         </record>
 
-    <menuitem id="sale_order_line_menu" name="Pos Sales Order Reports" action="action_orders_lines" parent="point_of_sale.menu_point_rep" sequence="2"/>
+    <menuitem id="sale_order_line_menu" name="Pos Sales Order Reports" action="action_orders_lines"
+              parent="point_of_sale.menu_point_rep" sequence="10"/>
 
 </odoo>
