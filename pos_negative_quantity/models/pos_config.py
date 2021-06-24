@@ -16,7 +16,6 @@ class PosConfig(models.Model):
         'hr.employee',
         'hr_employees_with_pos_rights',
         string='Allowed Employees with Negative Quantity',
-        compute='_compute_employee_ids_with_negative_qty',
         help='Allowed Employees with Negative Quantity',
     )
 
