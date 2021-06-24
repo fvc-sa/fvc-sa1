@@ -10,6 +10,29 @@ odoo.define("pos_access_right.models", function (require) {
             const cashier = this.env.pos.users.find(
                 (user) => user.id === pos_cashier.user_id[0]
             );
+
+            pos_cashier.employee_with_negative =false;
+            const cashierwithnegative = this.config.employee_ids_with_neqative_rights ;
+
+            if(typeof pos_cashier !== 'undefined'){
+            if(typeof pos_cashier.id !== 'undefined'){
+
+            //alert(pos_cashier.id);
+
+             if (cashierwithnegative.length > 0 ){
+                     if(cashierwithnegative.includes(pos_cashier.id)){
+                        pos_cashier.employee_with_negative =true;
+
+                    }
+                    else {
+                        pos_cashier.employee_with_negative=false;
+                    }
+
+
+
+            }
+                }
+                }
             pos_cashier.hasGroupNegativeQty =
                 cashier &&
                 cashier.groups_id.includes(

@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import fields, models ,api
 
 
 class PosConfig(models.Model):
@@ -11,6 +11,22 @@ class PosConfig(models.Model):
         help="This field is there to pass the id of the 'PoS - Allow Negative"
         " Quantity' Group to the Point of Sale Frontend.",
     )
+
+    employee_ids_with_neqative_rights = fields.Many2many(
+        'hr.employee',
+        string='Allowed Employees with Negative Quantity',
+        compute='_compute_employee_ids_with_negative_qty',
+        help='Allowed Employees with Negative Quantity',
+    )
+
+    @api.depends('module_pos_hr', 'employee_ids')
+    def _compute_employee_ids_with_negative_qty(self):
+        for config in self:
+            if config.module_pos_hr:
+                config.employee_ids_with_neqative_rights = config.employee_ids.ids
+            else:
+                config.employee_ids_with_neqative_rights = self.env['hr.employee'].search([]).ids
+
     def _compute_groups(self):
         self.update(
             {
@@ -19,3 +35,4 @@ class PosConfig(models.Model):
                 ).id,
             }
         )
+
