@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+    <record model="res.groups" id="group_negative_qty">
+        <field name="name"> Point of Sale - Negative Quantity</field>
+        <field name="category_id" ref="base.module_category_usability"></field>
+    </record>
+</odoo>
