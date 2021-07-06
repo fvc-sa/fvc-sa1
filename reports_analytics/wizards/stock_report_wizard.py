@@ -1,0 +1,378 @@
+import json
+from odoo import models, fields, api,tools ,_
+
+
+class StockOrderReportAnalyisWizard(models.TransientModel):
+    _name = 'stock.pos.order.wizard'
+
+
+    start_date = fields.Datetime(string="من تاريخ")
+    end_date = fields.Datetime(string="الى تاريخ" )
+    category = fields.Many2one('product.category' , string="فئة المنتج")
+    pos_category = fields.Many2one('pos.category',string="فئة نقطة البيع")
+    vendor = fields.Many2one('res.partner', string="المزود")
+    product = fields.Many2one('product.product',string=" المنتج")
+    order_id = fields.Char(string="رقم الطلب")
+
+    results = fields.Many2many(
+        "stock.pos.reports.temp",
+        string="Results",
+        compute="_compute_results",
+        help="Use compute fields, so there is nothing stored in database",
+    )
+
+
+    def compute_return_results(self,product_id=None ,vendor_id=None,end_date=None,start_date=None,order_id=None):
+        Result = self.env["return.pos.reports"]
+        domain = []
+        if start_date:
+            domain += [("date_order", ">=", start_date)]
+        if end_date:
+            domain += [("date_order", "<=", end_date)]
+        if vendor_id:
+            domain += [("vendor", "=", vendor_id.id)]
+        if product_id:
+            domain += [("product_id", "=", product_id.id)]
+        if order_id:
+            domain += [("order_id", "like", order_id)]
+        results = Result.search(domain,limit=1)
+        return results
+
+
+    def compute_discount_amount(self,product_id=None ,end_date=None,start_date=None,order_id=None):
+        discount_percent = 0
+        suitable_rule_id = 0
+        discount_amount= 0
+        Result = self.env["pos.order.line"]
+        domain = []
+        if start_date:
+            domain += [("order_id.date_order", ">=", start_date)]
+        if end_date:
+            domain += [("order_id.date_order", "<=", end_date)]
+        if product_id:
+            domain += [("product_id", "=", product_id.id)]
+        if order_id:
+            domain += [("order_id", "=", order_id)]
+        domain += [("order_id.state", "in",('invoiced','done'))]
+
+        results = Result.search(domain)
+        for order in results:
+            suitable_rule_id = order.order_id.pricelist_id.get_product_price_rule(order.product_id , order.qty or 1.0, order.order_id.partner_id)[1]
+            suitable_rule = self.env['product.pricelist.item'].search([('id', '=', suitable_rule_id),('company_id','=',self.env.user.company_id.id)], limit=1)
+            #raise validationerror(_("suitable_rule %(level)s ", level=suitable_rule))
+            if suitable_rule and suitable_rule.compute_price == 'fixed' and suitable_rule.base != 'pricelist' :
+                discount_amount = suitable_rule.fixed_price
+            elif suitable_rule and suitable_rule.compute_price != 'fixed' and suitable_rule.base != 'pricelist' :
+                discount_percent = suitable_rule.percent_price
+                if discount_percent > 0 :
+                    discount_amount += ((order.price_unit / (1- (discount_percent / 100 ))) - order.price_unit) * order.qty
+
+        return discount_amount
+
+    def compute_discount_percent(self,product_id=None ,end_date=None,start_date=None,order_id=None):
+        suitable_rule = False
+        suitable_rule_id = 0
+        discount_percent = 0
+        suitable_rule_id = 0
+        discount_amount= 0
+        Result = self.env["pos.order.line"]
+        domain = []
+        if start_date:
+            domain += [("order_id.date_order", ">=", start_date)]
+        if end_date:
+            domain += [("order_id.date_order", "<=", end_date)]
+        if product_id:
+            domain += [("product_id", "=", product_id.id)]
+        if order_id:
+            domain += [("order_id", "=", order_id)]
+        domain += [("order_id.state", "in",('invoiced','done'))]
+
+        results = Result.search(domain,limit=1)
+        for order in results:
+            suitable_rule_id = order.order_id.pricelist_id.get_product_price_rule(order.product_id , order.qty or 1.0, order.order_id.partner_id)[1]
+            suitable_rule = self.env['product.pricelist.item'].search([('id', '=', suitable_rule_id),('company_id','=',self.env.user.company_id.id)], limit=1)
+            if suitable_rule and suitable_rule.compute_price != 'fixed' and suitable_rule.base != 'pricelist' :
+                discount_percent = suitable_rule.percent_price
+            else:
+                discount_percent = 0.00
+        return discount_percent
+
+    def compute_purchases(self,product_id=None ,end_date=None,start_date=None,order_id=None,vendor_id=None):
+        qty_received =0
+        qty_purchase =0
+        amount_taxed=0
+        amount_untaxed=0
+        returnres={}
+        Result = self.env["purchase.order.line"]
+        domain = []
+        if start_date:
+            domain += [("order_id.date_order", ">=", start_date)]
+        if end_date:
+            domain += [("order_id.date_order", "<=", end_date)]
+        if product_id:
+            domain += [("product_id", "=", product_id.id)]
+        if vendor_id:
+            domain += [("order_id.partner_id", "=", vendor_id.id)]
+        #if order_id:
+        #    domain += [("order_id", "=", order_id)]
+        domain += [("order_id.state", "in",('invoiced','done'))]
+
+        results = Result.search(domain)
+        for order in results:
+            qty_received += order.qty_received
+            qty_purchase += order.product_qty
+            amount_taxed +=order.price_total
+            amount_untaxed += order.price_subtotal
+
+        returnres ={
+            'qty_received' : qty_received,
+            'qty_purchase' : qty_purchase,
+            'amount_taxed' : amount_taxed,
+            'amount_untaxed' :amount_untaxed,
+        }
+        return returnres
+
+    def compute_sales(self,product_id=None ,end_date=None,start_date=None,order_id=None):
+        qty_sales =0
+        amount_taxed=0
+        amount_untaxed=0
+        returnres={}
+        Result = self.env["pos.order.line"]
+        domain = []
+        if start_date:
+            domain += [("order_id.date_order", ">=", start_date)]
+        if end_date:
+            domain += [("order_id.date_order", "<=", end_date)]
+        if product_id:
+            domain += [("product_id", "=", product_id.id)]
+        if order_id:
+            domain += [("order_id", "=", order_id)]
+        domain += [("order_id.state", "in",('invoiced','done'))]
+        domain += [("qty", ">",0)]
+
+        results = Result.search(domain)
+        for order in results:
+            qty_sales += order.qty
+            amount_taxed +=order.price_subtotal
+            amount_untaxed += order.price_subtotal_incl
+
+        returnres ={
+            'qty_sales' : qty_sales,
+            'amount_taxed' : amount_taxed,
+            'amount_untaxed' :amount_untaxed,
+        }
+        return returnres
+
+    def _compute_results(self):
+        """ On the wizard, result will be computed and added to results line
+        before export to excel, by using xlsx.export
+        """
+        self.ensure_one()
+        #self.reinit()
+        Result = self.env["stock.pos.reports"]
+        tmpmodel=self.env["stock.pos.reports.temp"]
+        tmpmodel.search([]).unlink()
+        domain = []
+        # if self.start_date:
+        #    domain += [("date_order", ">=", self.start_date)]
+        #if self.end_date:
+        #    domain += [("date_order", "<=", self.end_date)]
+        if self.category:
+            domain += [("category", "=", self.category.id)]
+        if self.pos_category:
+            domain += [("pos_category", "=", self.pos_category.id)]
+        #if self.vendor:
+        #    domain += [("vendor", "=", self.vendor.id)]
+        if self.product:
+            domain += [("product_id", "=", self.product.id)]
+        #if self.order_id:
+        #    domain += [("order_id", "like", self.order_id)]
+        #self.results = Result.search(domain)
+
+        search_dist = Result.search(domain)
+
+        print('1_date ===',search_dist)
+
+        final_dist = []
+        if search_dist :
+            purchase_data = []
+            counter=1
+            for order in search_dist:
+                temp_data = {}
+
+                return_result={}
+                purchase_result = {}
+                sales_result = {}
+                discount_amount=0
+                discount_percent=0
+                return_result = self.compute_return_results(order.product_id,self.vendor,self.end_date,self.start_date,self.order_id)
+                purchase_result = self.compute_purchases(order.product_id,self.end_date,self.start_date,self.order_id,self.vendor)
+                sales_result = self.compute_sales(order.product_id,self.end_date,self.start_date,self.order_id)
+                discount_amount = self.compute_discount_amount(order.product_id,self.end_date,self.start_date,self.order_id)
+                discount_percent = self.compute_discount_percent(order.product_id,self.end_date,self.start_date,self.order_id)
+                #order.update({'discount_percent': discount_percent,'discount_amount':discount_amount,'return_qty':return_result.qty,'return_total':return_result.amount_taxed})
+                temp_data={
+                    'id' :order.id,
+                    'seq': counter,
+                    'product_name' : order.product_name,
+                    'barcode':order.barcode,
+                    'internal_ref' : order.internal_ref,
+                    'category' : order.category.name,
+                    'pos_category' : order.pos_category.name,
+                    'qty_received' : purchase_result.get('qty_received'),
+                    'qty_purchase' :purchase_result.get('qty_purchase'),
+                    'qty_available':order.product_id.qty_available,
+                    'purchase_amount_taxed' :purchase_result.get('amount_taxed'),
+                    'purchase_amount_untaxed' :purchase_result.get('amount_untaxed'),
+                    'qty_sales' : sales_result.get('qty_sales'),
+                    'amount_untaxed': sales_result.get('amount_untaxed'),
+                    "amount_taxed": sales_result.get('amount_taxed'),
+                    'discount_percent':discount_percent,
+                    'discount_amount':discount_amount,
+                    'return_qty':return_result.qty,
+                    'return_total':return_result.amount_taxed,
+                }
+                counter +=1
+                tmpmodel.create(temp_data)
+        #print('final_dist ===',final_dist)
+        #self.results=final_dist
+        self.results = tmpmodel.search([])
+
+
+
+    def get_selection_label(self, object, field_name, field_value):
+        return _(dict(self.env[object].fields_get(allfields=[field_name])[field_name]['selection'])[field_value])
+
+    def print_stock_report_pdf(self):
+        search_dist = []
+        data =[]
+        Result = self.env["stock.pos.reports"]
+        domain = []
+        #if self.start_date:
+        #    domain += [("date_order", ">=", self.start_date)]
+        #if self.end_date:
+        #    domain += [("date_order", "<=", self.end_date)]
+        if self.category:
+            domain += [("category", "=", self.category.id)]
+        if self.pos_category:
+            domain += [("pos_category", "=", self.pos_category.id)]
+        #if self.vendor:
+        #    domain += [("vendor", "=", self.vendor.id)]
+        if self.product:
+            domain += [("product_id", "=", self.product.id)]
+        #if self.order_id:
+        #    domain += [("order_id", "like", self.order_id)]
+        search_dist = Result.search(domain)
+        final_dist = []
+        if search_dist :
+            purchase_data = []
+            for order in search_dist:
+                temp_data = []
+                return_result={}
+                purchase_result={}
+                sales_result={}
+                discount_amount=0
+                discount_percent=0
+
+                return_result = self.compute_return_results(order.product_id,self.vendor,self.end_date,self.start_date,self.order_id)
+                purchase_result = self.compute_purchases(order.product_id,self.end_date,self.start_date,self.order_id,self.vendor)
+                sales_result = self.compute_sales(order.product_id,self.end_date,self.start_date,self.order_id)
+                discount_amount = self.compute_discount_amount(order.product_id,self.end_date,self.start_date,self.order_id)
+                discount_percent = self.compute_discount_percent(order.product_id,self.end_date,self.start_date,self.order_id)
+
+                temp_data.append(order.seq)
+                temp_data.append(order.product_name)
+                temp_data.append(order.barcode)
+                temp_data.append(order.internal_ref)
+                temp_data.append(order.category.name)
+                temp_data.append(order.pos_category.name)
+                #temp_data.append(order.qty)
+                temp_data.append(purchase_result.get('qty_purchase'))
+                temp_data.append(purchase_result.get('qty_received'))
+                temp_data.append(order.product_id.qty_available)
+                #temp_data.append(order.product_tmpl_id.location_id)
+                temp_data.append("")
+                temp_data.append(purchase_result.get('amount_untaxed'))
+                temp_data.append(purchase_result.get('amount_taxed'))
+                temp_data.append(sales_result.get('qty_sales'))
+                temp_data.append(sales_result.get('amount_untaxed'))
+                temp_data.append(sales_result.get('amount_taxed'))
+                #temp_data.append(order.amount_untaxed)
+                #temp_data.append(order.amount_taxed)
+                temp_data.append(discount_percent)
+                temp_data.append(discount_amount)
+                if return_result :
+                    temp_data.append(return_result.qty)
+                    temp_data.append(return_result.amount_taxed)
+                else :
+                    temp_data.append(0)
+                    temp_data.append(0)
+
+                purchase_data.append(temp_data)
+            final_dist = purchase_data
+        data = {
+            'ids': self,
+            'model': 'stock.pos.order.wizard',
+            'docs': final_dist,
+            'start_date': self.start_date,
+            'end_date': self.end_date,
+            'category': self.category.name,
+            'pos_category': self.pos_category.name,
+            'vendor': self.vendor.name,
+            'product': self.product.name,
+            'order_id':self.order_id,
+        }
+        return self.env.ref('reports_analytics.action_report_stock_pdf').report_action([], data=data)
+
+
+
+
+
+
+class StockTemplateDateForReport(models.Model):
+    _name="stock.pos.reports.temp"
+    id = fields.Integer(string="id")
+    seq =fields.Integer(string="seq")
+    product_name=fields.Char(string="product_name")
+    barcode=fields.Char(string="barcode")
+    internal_ref=fields.Char(string="internal_ref")
+    category=fields.Char(string="category")
+    pos_category=fields.Char(string="pos_category")
+    qty_received=fields.Float(string="qty_received")
+    qty_purchase=fields.Float(string="qty_purchase")
+    qty_available=fields.Float(string="qty_available")
+    location=fields.Char(string="location" ,default=" ")
+    purchase_amount_taxed=fields.Float(string="purchase_amount_taxed")
+    purchase_amount_untaxed=fields.Float(string="purchase_amount_untaxed")
+    qty_sales=fields.Float(string="qty_sales")
+    amount_untaxed =fields.Float(string="amount_untaxed")
+    amount_taxed = fields.Float(string="amount_taxed")
+    discount_percent=fields.Float(string="discount_percent")
+    discount_amount=fields.Float(string="discount_amount")
+    return_qty=fields.Float(string="return_qty")
+    return_total=fields.Float(string="return_total")
+
+
+
+
+
+class StockOrderReportAnalyisReportpdf(models.AbstractModel):
+    _name = 'report.reports_analytics.stock_report_pdf'
+
+    @api.model
+    def _get_report_values(self, docids, data=None):
+        print('last_date ===',data['docs'])
+
+        return {
+            'doc_ids': data.get('ids'),
+            'doc_model': data.get('model'),
+            'docs': data['docs'],
+            'start_date': data['start_date'],
+            'end_date': data['end_date'],
+            'category': data['category'],
+            'pos_category': data['pos_category'],
+            'vendor': data['vendor'],
+            'product': data['product'],
+            'order_id':data['order_id'],
+        }
+
