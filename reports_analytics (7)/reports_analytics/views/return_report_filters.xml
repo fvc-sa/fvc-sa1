@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_report_return_order_filters" model="ir.ui.view">
+        <field name="name">return.pos.reports.tree</field>
+        <field name="model">return.pos.reports</field>
+        <field name="arch" type="xml">
+            <search string="test">
+                <filter name="filter_date" date="date_order" default_period="this_month"/>
+                <field name="category" string="فئة المنتج" />
+                <field name="pos_category" string="فئة نقطة البيع" />
+                <field name="product_template" string=" المنتج"/>
+                <field name="vendor" />
+                <field name="date_order"/>
+                <group expand="1" string="Group By">
+                    <filter string="التاريخ" name="order_month" context="{'group_by':'date_order:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>
