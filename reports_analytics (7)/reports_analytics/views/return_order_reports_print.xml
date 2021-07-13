@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_report_return_order_custom" model="ir.ui.view">
+            <field name="name">return.pos.reports.tree</field>
+            <field name="model">return.pos.reports</field>
+            <field name="arch" type="xml">
+               <tree delete="false" create="false" string="تقرير المرتجعات" >
+                   <field name="seq" optional="show" />
+                   <field name="product_name"  optional="show" />
+                   <field name="barcode" optional="show" />
+                   <field name="category" optional="show" />
+                   <field name="pos_category" optional="show" />
+                   <field name="amount_untaxed"  sum="الاجمالي" optional="show" />
+                   <field name="amount_taxed" sum="الاجمالي" optional="show" />
+                   <field name="date_order" optional="show" />
+                   <field name="time_order" optional="show" />
+                   <field name="user_name" optional="show" />
+                   <field name="cashier_name" optional="show" />
+                   <field name="session" optional="show" />
+                   <field name="invoice_id" optional="show" />
+               </tree>
+            </field>
+    </record>
+    <record id="view_report_return_order_pivot" model="ir.ui.view">
+            <field name="name">return.pos.reports.pivot</field>
+            <field name="model">return.pos.reports</field>
+            <field name="arch" type="xml">
+               <pivot disable_linking="True" sample="1"  string="تقرير المرتجعات" >
+                   <field name="seq"  />
+                   <field name="product_name"  type="row" />
+                   <field name="barcode"  />
+                   <field name="category"  />
+                   <field name="pos_category"  />
+                   <field name="amount_untaxed" type="measure"  />
+                   <field name="amount_taxed" type="measure" />
+                   <field name="date_order" />
+                   <field name="time_order" />
+                   <field name="user_name"  />
+                   <field name="cashier_name"  />
+                   <field name="session"  />
+                   <field name="invoice_id" />
+               </pivot>
+            </field>
+    </record>
+    <report
+        id="action_report_return_pdf"
+        string='تقرير المرتجعات '
+        model="return.pos.order.wizard"
+        report_type="qweb-pdf"
+        file="return_report_pdf"
+        name="reports_analytics.return_report_pdf"
+    />
+    <report
+        id='action_report_return_excel'
+        string='تقرير المرتجعات (.xlsx)'
+        model='return.pos.order.wizard'
+        name='return_report.xlsx'
+        file='return_report'
+        report_type='excel'
+    />
+    <record id="action_return_orders_lines" model="ir.actions.act_window">
+            <field name="name"> تقرير المرتجعات</field>
+            <field name="res_model">return.pos.reports</field>
+            <field name="view_mode">tree,pivot</field>
+            <field name="view_id" ref="view_report_return_order_custom" />
+            <field name="search_view_id" ref="reports_analytics.view_report_return_order_filters"/>
+        </record>
+
+    <!--<menuitem id="return_pos_report_menu" name=" المرتجعات" action="action_return_orders_lines"
+              parent="point_of_sale.menu_point_rep" sequence="20"/>-->
+
+</odoo>
