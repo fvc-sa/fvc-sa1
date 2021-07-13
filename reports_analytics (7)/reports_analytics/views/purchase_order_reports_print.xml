@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_report_purchase_order_custom" model="ir.ui.view">
+            <field name="name">purchasereport.order.tree</field>
+            <field name="model">purchasereport.order</field>
+            <field name="arch" type="xml">
+               <tree delete="false" create="false"  string="تقرير المشتريات" >
+                   <field name="seq" optional="show" />
+                   <field name="invoice_id"  optional="show" />
+                   <field name="order_id" optional="show" />
+                   <field name="vendor" optional="show" />
+                   <field name="date_order" optional="show" />
+                   <field name="quantity" sum="الاجمالي" optional="show" />
+                   <field name="amount_untaxed"  sum="الاجمالي" optional="show" />
+                   <field name="amount_taxed" sum="الاجمالي" optional="show" />
+                   <field name="amount_total" sum="الاجمالي" optional="show" />
+               </tree>
+            </field>
+        </record>
+
+    <record id="view_report_purchase_order_pivot" model="ir.ui.view">
+            <field name="name">purchasereport.order.pivot</field>
+            <field name="model">purchasereport.order</field>
+            <field name="arch" type="xml">
+               <pivot disable_linking="True" sample="1"   string="تقرير المشتريات" >
+                   <field name="seq" />
+                   <field name="invoice_id"  />
+                   <field name="order_id" type="row" />
+                   <field name="vendor"  />
+                   <field name="date_order" />
+                   <field name="quantity"  type="measure" />
+                   <field name="amount_untaxed"  type="measure" />
+                   <field name="amount_taxed" type="measure" />
+                   <field name="amount_total" type="measure" />
+               </pivot>
+            </field>
+    </record>
+    <report
+        id="action_report_purchase_pdf"
+        string='تقرير المشتريات '
+        model="purchasereport.order.wizard"
+        report_type="qweb-pdf"
+        file="purchase_report_pdf"
+        name="reports_analytics.purchase_report_pdf"
+    />
+    <report
+        id='action_report_purchase_excel'
+        string='تقرير المشتريات (.xlsx)'
+        model='purchasereport.order.wizard'
+        name='purchase_report.xlsx'
+        file='purchase_report'
+        report_type='excel'
+    />
+    <record id="action_purchase_orders_lines" model="ir.actions.act_window">
+            <field name="name"> تقرير المشتريات</field>
+            <field name="res_model">purchasereport.order</field>
+            <field name="view_mode">tree,pivot</field>
+            <field name="view_id" ref="view_report_purchase_order_custom" />
+            <field name="search_view_id" ref="reports_analytics.view_report_purchase_order_filters"/>
+    </record>
+
+    <!--<menuitem id="purchase_order_line_menu" name="تقرير المشتريات" action="action_purchase_orders_lines"
+              parent="purchase.purchase_report" sequence="2"/>-->
+    <menuitem id="purchase_order_report_all_menu" name="Purchase Analysis" action="purchase.action_purchase_order_report_all"
+              parent="purchase.purchase_report" sequence="1"/>
+
+</odoo>
