@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="purchase_report_xlsx_template" model="xlsx.template">
+        <field name="res_model">purchasereport.order.wizard</field>
+        <field name="fname">purchase_report.xlsx</field>
+        <field name="name">Purchase Report Template</field>
+        <field
+            name="description"
+        >Sample Purchase List Report Template </field>
+        <field name="input_instruction">
+            {
+                '__EXPORT__': {
+                    1: {
+                        '_HEAD_': {
+                            'C9': 'start_date${value or ""}#{align=left;style=date}',
+                            'D9': 'end_date${value or ""}#{align=left;style=date}',
+                            'C10': 'order_id${value or ""}#{align=center;style=text}',
+                            'C11': 'vendor.name${value or ""}#{align=center;style=text}',
+                        },
+                        'results': {
+                            'B14': 'seq${value or 0}',
+                            'C14': 'invoice_id${value or ""}#{style=text}',
+                            'D14': 'order_id${value or ""}#{style=text}',
+                            'E14': 'vendor${value or ""}#{style=text}',
+                            'F14': 'date_order${value or ""}#{style=text}',
+                            'G14': 'quantity${value or 0}#{style=number}@{sum}',
+                            'H14': 'amount_untaxed${value or 0}#{style=number}@{sum}',
+                            'I14': 'amount_taxed${value or 0}#{style=number}@{sum}',
+                            'J14': 'amount_total${value or 0}#{style=number}@{sum}',
+                        }
+                    }
+                },
+            }
+        </field>
+    </record>
+
+    <record id="discount_report_xlsx_template" model="xlsx.template">
+        <field name="res_model">discount.pos.order.wizard</field>
+        <field name="fname">discount_report.xlsx</field>
+        <field name="name">Discount Report Template</field>
+        <field
+            name="description"
+        >Sample Discount List Report Template </field>
+        <field name="input_instruction">
+            {
+                '__EXPORT__': {
+                    1: {
+                        '_HEAD_': {
+                            'B6': 'start_date${value or ""}#{align=left;style=date}',
+                            'C6': 'end_date${value or ""}#{align=left;style=date}',
+                            'B7': 'category.name${value or ""}#{align=left;style=text}',
+                            'B8': 'pos_category.name${value or ""}#{align=left;style=text}',
+                            'B9': 'vendor.name${value or ""}#{align=left;style=text}',
+                            'B10': 'product.name${value or ""}#{align=left;style=text}',
+                            'B11': 'order_id${value or ""}#{align=left;style=text}',
+                        },
+                        'results': {
+                            'B14': 'seq${value or 0}',
+                            'C14': 'product_name${value or ""}#{style=text}',
+                            'D14': 'barcode${value or ""}#{style=text}',
+                            'E14': 'internal_ref${value or ""}#{style=text}',
+                            'F14': 'category.name${value or ""}#{style=text}',
+                            'G14': 'pos_category.name${value or ""}#{style=number}',
+                            'H14': 'qty${value or 0}#{style=number}@{sum}',
+                            'I14': 'amount_untaxed${value or 0}#{style=number}@{sum}',
+                            'J14': 'amount_taxed${value or 0}#{style=number}@{sum}',
+                            'K14': 'discount_percent${value or 0}#{style=number}',
+                            'L14': 'discount_amount${value or 0}#{style=number}@{sum}',
+                            'M14': 'amount_total${value or 0}#{style=number}@{sum}',
+                            'N14': 'session${value or ""}#{style=text}',
+                            'O14': 'invoice_id${value or ""}#{style=text}',
+
+                        }
+                    }
+                },
+            }
+        </field>
+    </record>
+
+    <record id="return_report_xlsx_template" model="xlsx.template">
+        <field name="res_model">return.pos.order.wizard</field>
+        <field name="fname">return_report.xlsx</field>
+        <field name="name">Return Report Template</field>
+        <field
+            name="description"
+        >Sample Return POS Report Template </field>
+        <field name="input_instruction">
+            {
+                '__EXPORT__': {
+                    1: {
+                        '_HEAD_': {
+                            'C6': 'start_date${value or ""}#{align=left;style=date}',
+                            'D6': 'end_date${value or ""}#{align=left;style=date}',
+                            'C7': 'category.name${value or ""}#{align=left;style=text}',
+                            'C8': 'pos_category.name${value or ""}#{align=left;style=text}',
+                            'C9': 'vendor.name${value or ""}#{align=left;style=text}',
+                            'C10': 'product.name${value or ""}#{align=left;style=text}',
+                        },
+                        'results': {
+                            'B14': 'seq${value or 0}',
+                            'C14': 'product_name${value or ""}#{style=text}',
+                            'D14': 'barcode${value or ""}#{style=text}',
+                            'E14': 'category.name${value or ""}#{style=text}',
+                            'F14': 'pos_category.name${value or ""}#{style=number}',
+                            'G14': 'amount_untaxed${value or 0}#{style=number}@{sum}',
+                            'H14': 'amount_taxed${value or 0}#{style=number}@{sum}',
+                            'I14': 'date_order${value or ""}#{style=text}',
+                            'J14': 'time_order${value or ""}#{style=text}',
+                            'K14': 'user_name${value or ""}#{style=text}',
+                            'L14': 'cashier_name${value or ""}#{style=text}',
+                            'M14': 'session${value or ""}#{style=text}',
+                            'N14': 'invoice_id${value or ""}#{style=text}',
+
+                        }
+                    }
+                },
+            }
+        </field>
+    </record>
+
+    <record id="stock_report_xlsx_template" model="xlsx.template">
+        <field name="res_model">stock.pos.order.wizard</field>
+        <field name="fname">stock_report.xlsx</field>
+        <field name="name">Stock Report Template</field>
+        <field
+            name="description"
+        >Sample Stock Report Template </field>
+        <field name="input_instruction">
+            {
+                '__EXPORT__': {
+                    1: {
+                        '_HEAD_': {
+                            'C6': 'start_date${value or ""}#{align=left;style=date}',
+                            'D6': 'end_date${value or ""}#{align=left;style=date}',
+                            'C7': 'category.name${value or ""}#{align=left;style=text}',
+                            'C8': 'pos_category.name${value or ""}#{align=left;style=text}',
+                            'C9': 'vendor.name${value or ""}#{align=left;style=text}',
+                            'C10': 'product.name${value or ""}#{align=left;style=text}',
+                            'C11': 'order_id${value or ""}#{align=left;style=text}',
+                            'H8': 'net_sales_untaxed${value or ""}#{align=left;style=number}',
+                            'H9': 'net_sales_taxed${value or ""}#{align=left;style=number}',
+                        },
+                        'results': {
+                            'B14': 'seq${value or ""}',
+                            'C14': 'product_name${value or ""}#{style=text}',
+                            'D14': 'barcode${value or ""}#{style=text}',
+                            'E14': 'internal_ref${value or ""}#{style=text}',
+                            'F14': 'category${value or ""}#{style=text}',
+                            'G14': 'pos_category${value or ""}#{style=text}',
+                            'H14': 'qty_purchase${value or 0}#{style=number}@{sum}',
+                            'I14': 'qty_received${value or 0}#{style=number}@{sum}',
+                            'J14': 'qty_available${value or 0}#{style=number}@{sum}',
+                            'K14': 'location${value or ""}#{style=text}',
+                            'l14': 'purchase_amount_untaxed${value or 0}#{style=number}@{sum}',
+                            'M14': 'purchase_amount_taxed${value or 0}#{style=number}@{sum}',
+                            'N14': 'qty_sales${value or 0}#{style=number}@{sum}',
+                            'O14': 'amount_untaxed${value or 0}#{style=number}@{sum}',
+                            'P14': 'amount_taxed${value or 0}#{style=number}@{sum}',
+                            'Q14': 'discount_percent${value or 0}#{style=number}',
+                            'R14': 'discount_amount${value or 0}#{style=number}@{sum}',
+                            'S14': 'return_qty${value or 0}#{style=number}@{sum}',
+                            'T14': 'return_total${value or 0}#{style=number}@{sum}',
+
+                        }
+                    }
+                },
+            }
+        </field>
+    </record>
+
+    <function model="xlsx.template" name="load_xlsx_template">
+        <value eval="[ref('purchase_report_xlsx_template')]" />
+    </function>
+   <function model="xlsx.template" name="load_xlsx_template">
+        <value eval="[ref('discount_report_xlsx_template')]" />
+    </function>
+   <function model="xlsx.template" name="load_xlsx_template">
+        <value eval="[ref('return_report_xlsx_template')]" />
+   </function>
+
+   <function model="xlsx.template" name="load_xlsx_template">
+        <value eval="[ref('stock_report_xlsx_template')]" />
+   </function>
+
+</odoo>
