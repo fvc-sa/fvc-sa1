@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_session_summary">
+        <t t-call="web.html_container">
+
+            <t t-call="web.external_layout">
+                <style>
+                    .table, .table td{
+                      border: 1px solid #ddd;
+                      text-align: right;
+                    }
+                     .table th {
+                      border: 1px solid #ddd;
+                      text-align: center;
+                    }
+
+                    .table {
+                      border-collapse: collapse;
+                      width: 100%;
+                    direction: rtl;
+                    }
+
+                    .table th, .table td {
+                      padding: 2px;
+                    font-size:13px;
+                    }
+                    .foot-tr td{
+                    text-align: center;
+                    font-size:17px;
+                       padding: 5px;
+                    }
+                   thead { display: table-header-group }
+                    tfoot { display: table-row-group }
+                    tr { page-break-inside: avoid }
+                </style>
+                <t t-foreach="docs" t-as="o">
+                    <t t-set="product_wise_report" t-value="o.wk_session_sale_categ_details()"/>
+                    <div class="page">
+                    <div class="oe_structure"/>
+                    <center>
+                        <b>
+                            <h3>
+                                <span t-field="o.name"/>
+                                : تقرير الجلسة
+                            </h3>
+                        </b>
+                    </center>
+                    <table class="table table-condensed">
+                        <tr  t-if="o.start_at or o.stop_at">
+                            <th>
+                                تاريخ الفتح و الاغلاق
+                            </th>
+                            <th>
+                                <span t-esc="o.start_at" t-options='{"widget": "date"}'/>
+                            </th>
+                            <th>
+                                <span t-esc="o.stop_at" t-options='{"widget": "date"}'/>
+                            </th>
+                        </tr>
+                    </table>
+                    <br/>
+                    <table class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th style="width:2%">#</th>
+                                    <th>الفئة</th>
+                                    <th>اجمالي المبيعات ب/ض</th>
+                                    <th>اجمالي المبيعات م/ض</th>
+                                    <th>اجمالي المرتجعات ب/ض</th>
+                                    <th>اجمالي المرتجعات م/ض</th>
+                                </tr>
+                                </thead>
+                                <t t-set="tax_sum" t-value="0"/>
+                                <t t-set="seq" t-value="0"/>
+                                <t t-set="untax_sum" t-value="0"/>
+                                <t t-set="return_tax_sum" t-value="0"/>
+                                <t t-set="return_untax_sum" t-value="0"/>
+                                <tr t-foreach="product_wise_report" t-as="order">
+                                    <td>
+                                        <t t-set="seq" t-value="seq + 1"/>
+                                        <span t-esc="seq"/>
+                                    </td>
+                                    <td><span t-esc="order.get('cat_name')"/></td>
+                                    <td>
+                                        <t t-set="untax_sum" t-value="untax_sum + order.get('cate_total')"/>
+                                        <span t-esc="order.get('cate_total')" t-options='{"widget": "float", "precision": 2}'/>
+                                    </td>
+                                    <td>
+                                        <t t-set="tax_sum" t-value="tax_sum + order.get('cate_total_incl')"/>
+                                        <span t-esc="order.get('cate_total_incl')" t-options='{"widget": "float", "precision": 2}'/>
+                                    </td>
+                                    <td>
+                                        <t t-set="return_untax_sum"
+                                           t-value="return_untax_sum + order.get('cate_return_total')"/>
+                                        <span t-esc="order.get('cate_return_total')" t-options='{"widget": "float", "precision": 2}'/>
+                                    </td>
+                                    <td>
+                                        <t t-set="return_tax_sum"
+                                           t-value="return_tax_sum + order.get('cate_return_total_incl')"/>
+                                        <span t-esc="order.get('cate_return_total_incl')" t-options='{"widget": "float", "precision": 2}'/>
+                                    </td>
+
+                                </tr>
+                                <tfoot>
+                                <tr class="foot-tr">
+                                    <td style="width:2%">
+                                        <span t-esc="seq"/>
+                                    </td>
+                                    <td>
+                                        <span>
+                                            الاجمالي
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span t-esc="untax_sum" t-options='{"widget": "float", "precision": 2}'/>
+                                    </td>
+
+                                    <td>
+                                        <span t-esc="tax_sum" t-options='{"widget": "float", "precision": 2}'/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="return_untax_sum" t-options='{"widget": "float", "precision": 2}'/>
+                                    </td>
+
+                                    <td>
+                                        <span t-esc="return_tax_sum" t-options='{"widget": "float", "precision": 2}'/>
+                                    </td>
+                                </tr>
+                                </tfoot>
+
+                    </table>
+                </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    </data>
+</odoo>
