@@ -10,7 +10,7 @@ class IrActionsReport(models.Model):
     _inherit = "ir.actions.report"
 
     @api.model
-    def qr_generate(self, value, box_size=3, border=5, factory="png", **kwargs):
+    def qr_generate(self, value, box_size=4, border=5, factory="png", **kwargs):
         factories = {
             "png": pil.PilImage,
             "svg": svg.SvgImage,
