@@ -20,3 +20,14 @@ class Home(http.Controller):
                 barcode, headers=[("Content-Type", "image/svg+xml")]
             )
         return request.make_response(barcode, headers=[("Content-Type", "image/png")])
+
+    @http.route("/report/ajaxqr", type="http", auth="public")
+    def report_ajaxqr(self, value):
+        try:
+            barcode = request.env["ir.actions.report"].get_qr_code(value)
+        except (ValueError, AttributeError):
+            raise werkzeug.exceptions.HTTPException(
+                description="Cannot convert into barcode."
+            )
+
+        return request.make_response(barcode)
