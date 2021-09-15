@@ -11,6 +11,7 @@ class StockPosOrderReportAnalyis(models.Model):
     _description = "Stock Point of Sale Orders Report"
     _auto = False
     _order = 'id ASC'
+    _check_company_auto = True
 
     id = fields.Integer(string="التسلسل", readonly=True , store=True)
     seq = fields.Integer(string="التسلسل", related='id' , store=True)
