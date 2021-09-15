@@ -187,9 +187,11 @@ class StockOrderReportAnalyisWizard(models.TransientModel):
         }
         return returnres
 
-    def get_products_by_vendor(self, product_tmpl_id, vendor_id):
+    def get_products_by_vendor(self, product_tmpl_id, vendor_id , company_id):
         res = self.env['product.supplierinfo']
         domain = []
+        if company_id :
+            domain +=[("company_id","=",company_id.id)]
         if product_tmpl_id:
             domain += [("product_tmpl_id", "=", product_tmpl_id.id)]
         if vendor_id:
@@ -229,6 +231,7 @@ class StockOrderReportAnalyisWizard(models.TransientModel):
         # if self.order_id:
         #    domain += [("order_id", "like", self.order_id)]
         # self.results = Result.search(domain)
+
         domain += ['|', ("company_id", "=", False), ("company_id", "=", self.company_id.id)]
         search_dist = Result.search(domain)
 
@@ -266,7 +269,8 @@ class StockOrderReportAnalyisWizard(models.TransientModel):
                     'pos_category': order.pos_category.name,
                     'qty_received': purchase_result.get('qty_received'),
                     'qty_purchase': purchase_result.get('qty_purchase'),
-                    'qty_available': self.get_product_quantity(order.product_id, self.company_id),
+                     'qty_available': self.get_product_quantity(order.product_id, self.start_date,self.end_date, self.company_id),
+                    #'qty_available': order.product_id.qty_available,
                     'purchase_amount_taxed': purchase_result.get('amount_taxed'),
                     'purchase_amount_untaxed': purchase_result.get('amount_untaxed'),
                     'qty_sales': sales_result.get('qty_sales'),
@@ -280,7 +284,7 @@ class StockOrderReportAnalyisWizard(models.TransientModel):
                     'fields_hide': self.fields_hide,
                 }
                 if self.vendor:
-                    if self.get_products_by_vendor(order.product_tmpl_id, self.vendor):
+                    if self.get_products_by_vendor(order.product_tmpl_id, self.vendor,self.company_id):
                         if self.order_id :
                             if purchase_result.get('qty_purchase') > 0 :
                                 counter += 1
@@ -321,18 +325,26 @@ class StockOrderReportAnalyisWizard(models.TransientModel):
     def get_selection_label(self, object, field_name, field_value):
         return _(dict(self.env[object].fields_get(allfields=[field_name])[field_name]['selection'])[field_value])
 
-    def get_product_quantity(self, product_id, company_id):
+    def get_product_quantity(self, product_id,start_date,end_date, company_id):
         qty = 0
         res = self.env['stock.quant']
         domain = []
-        domain += [("quantity", ">", 0)]
+        #domain += [("quantity", ">", 0)]
         if company_id:
             domain += [("company_id", "=", company_id.id)]
+        if end_date :
+            to_date=end_date
         if product_id:
             domain += [("product_id", "=", product_id.id)]
-            qty = res.search(domain, limit=1, order='id desc').quantity
-            if qty < 0:
-                qty = 0.00
+            warehouseid= self.env['stock.warehouse'].search([("company_id","=",company_id.id)] ,limit=1).id
+            if to_date:
+                qty = self.env['product.product'].browse(product_id.id).with_context(
+                    {'warehouse': warehouseid,'to_date':to_date}).qty_available
+            else:
+                qty = self.env['product.product'].browse(product_id.id).with_context({'warehouse': warehouseid})
+            #qty = res.search(domain, limit=1, order='write_date desc').quantity
+            #if qty < 0:
+                #qty = 0.00
         return qty
 
     def print_stock_report_pdf(self):
@@ -378,7 +390,7 @@ class StockOrderReportAnalyisWizard(models.TransientModel):
                 sales_result = {}
                 discount_amount = 0
                 discount_percent = 0
-
+                product_qty_on_hand=0
                 return_result = self.compute_return_results(order.product_id, self.vendor, self.end_date,
                                                             self.start_date, self.order_id)
                 purchase_result = self.compute_purchases(order.product_id, self.end_date, self.start_date,
@@ -388,7 +400,7 @@ class StockOrderReportAnalyisWizard(models.TransientModel):
                                                                self.start_date, self.order_id)
                 discount_percent = self.compute_discount_percent(self.company_id, order.product_id, self.end_date,
                                                                  self.start_date, self.order_id)
-
+                product_qty_on_hand=self.get_product_quantity(order.product_id,self.start_date,self.end_date,self.company_id)
                 temp_data.append(countdata)
                 temp_data.append(order.product_id.name)
                 temp_data.append(order.barcode)
@@ -398,7 +410,7 @@ class StockOrderReportAnalyisWizard(models.TransientModel):
                 # temp_data.append(order.qty)
                 temp_data.append(purchase_result.get('qty_purchase'))
                 temp_data.append(purchase_result.get('qty_received'))
-                temp_data.append(order.product_id.qty_available)
+                temp_data.append(product_qty_on_hand)
                 # temp_data.append(order.product_tmpl_id.location_id)
                 temp_data.append("")
                 temp_data.append(purchase_result.get('amount_untaxed'))
@@ -420,12 +432,20 @@ class StockOrderReportAnalyisWizard(models.TransientModel):
                     temp_data.append(0)
 
                 if self.vendor:
-                    if self.get_products_by_vendor(order.product_tmpl_id, self.vendor):
+                    if self.get_products_by_vendor(order.product_tmpl_id, self.vendor,self.company_id):
                         if self.order_id :
                             if purchase_result.get('qty_purchase') > 0 :
                                 purchase_data.append(temp_data)
+                                sales_untaxed = sales_untaxed + temp_data[13]
+                                sales_taxed = sales_taxed + temp_data[14]
+                                return_total = return_total + temp_data[18]
+                                return_sub_total = return_sub_total + temp_data[19]
                         else :
                             purchase_data.append(temp_data)
+                            sales_untaxed = sales_untaxed + temp_data[13]
+                            sales_taxed = sales_taxed + temp_data[14]
+                            return_total = return_total + temp_data[18]
+                            return_sub_total = return_sub_total + temp_data[19]
                 else:
                     if self.order_id:
                         if purchase_result.get('qty_purchase') > 0:
