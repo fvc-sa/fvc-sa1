@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="discount_report_wizard" model="ir.ui.view">
+        <field name="name">تقرير الخصومات</field>
+        <field name="model">discount.pos.order.wizard</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="تقرير الخصومات">
+                <group>
+                    <group>
+                        <field name="start_date"/>
+                    </group>
+                    <group>
+                        <field name="end_date"/>
+                    </group>
+                </group>
+                <group>
+                    <group>
+                        <field name="order_id" />
+                    </group>
+                    <group>
+                        <field name="vendor"  context="{'res_partner_search_mode': 'supplier', 'show_vat': True}"  widget="many2one" />
+                    </group>
+                    <group>
+                        <field name="category"  widget="many2one" />
+                        <field name="company_id" invisible="1" widget="many2one"/>
+                    </group>
+                </group>
+                <group>
+                    <group>
+                        <field name="pos_category"  widget="many2one" />
+                    </group>
+                    <group>
+                        <field name="product"  widget="many2one" />
+                    </group>
+                </group>
+                <group>
+                    <field name="fields_report" widget="many2many_checkboxes" options="{'no_create_edit':'1'}"/>
+                </group>
+                <footer>
+                    <button name="print_discount_report_pdf" string="Print PDF" type="object" class="oe_highlight"/>
+                    <button
+                        name='%(reports_analytics.action_report_discount_excel)d'
+                        type='action'
+                        string='EXPORT XSLX'
+                        class='oe_highlight'
+                    />
+                    <button string="Cancel" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_discount_report_wizard" model="ir.actions.act_window">
+        <field name="name">Discount Report</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">discount.pos.order.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="discount_report_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem action="action_discount_report_wizard"
+              id="menu_discount_report_wizard"
+              name="تقرير الخصومات "
+              sequence="50"
+              parent="point_of_sale.menu_point_rep"/>
+</odoo>
