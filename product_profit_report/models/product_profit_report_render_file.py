@@ -14,7 +14,7 @@ class ReportRender(models.AbstractModel):
         res = self.env['purchase.order.line']
         domain = []
         result = {}
-        domain += [("order_id.state", "in", ('invoiced', 'done', 'paid'))]
+        domain += [("price_total", ">", 0)]
         if company_id :
             domain +=[("company_id","=",company_id)]
         if product_id:
