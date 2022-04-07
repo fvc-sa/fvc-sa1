@@ -2,9 +2,9 @@
 <odoo>
 
     <template id="label_57x35">
-            <div class="o_label_dymo" style="display: inline-table;" t-att-style="padding_page">
+              <div class="o_label_dymo" style="display: inline-table;" t-att-style="padding_page">
                 <div class="o_label_full" t-att-style="table_style">
-                    <div t-if="label.product_id.barcode" class="text-right o_label_small_barcode" style="float:right;margin-right:-4mm">
+                    <div t-if="label.product_id.barcode" class="text-right o_label_small_barcode" style="float:right;margin-right:0mm">
                         <t t-if="label.wizard_id.humanreadable" t-set="show_code" t-value="1"/>
                         <t t-else="" t-set="show_code" t-value="0"/>
                         <div class="text-center" t-field="label.product_id.barcode" style="padding:0;padding-top: 3mm;" t-options="{'widget': 'barcode', 'quiet': 0, 'symbology': 'auto', 'img_style': barcode_size}"/>
