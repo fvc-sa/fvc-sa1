@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <template id="label_57x35">
+            <div class="o_label_dymo" style="display: inline-table;" t-att-style="padding_page">
+                <div class="o_label_full" t-att-style="table_style">
+                    <div t-if="label.product_id.barcode" class="text-left o_label_small_barcode" style="float:left;">
+                        <t t-if="label.wizard_id.humanreadable" t-set="show_code" t-value="1"/>
+                        <t t-else="" t-set="show_code" t-value="0" />
+                        <div class="text-center" t-out="label.product_id.barcode"
+                             style="padding:0;padding-left: -2mm;" t-options="{'widget': 'barcode', 'quiet': 0, 'symbology': 'auto', 'img_style': barcode_size}"/>
+                        <t t-if="show_code">
+                            <div class="o_label_name text-center"
+                                 style="padding:0;font-size: 8px;background-color: transparent;">
+                                <span class="text-center" t-out="label.product_id.barcode"/>
+                            </div>
+                        </t>
+                    </div>
+                    <div class="text-center "
+                         style="font-size: 12px;float:left; padding: 0;line-height:normal;padding-left: 2mm;padding-top: 1mm;">
+                        <t t-if="label.product_id.is_product_variant">
+                            <span style="font-size: 12px;" t-if="label.product_id.currency_id.position == 'before'"
+                                   t-field="label.product_id.currency_id.symbol"/>
+                            <span style="font-size: 12px;background-color: transparent;padding: 0" class="" t-field="label.product_id.lst_price" />
+                            <span style="font-size: 12px;" t-if="label.product_id.currency_id.position == 'after'"
+                                  t-field="label.product_id.currency_id.symbol"/>
+
+                        </t>
+                        <t t-else="">
+                            <span style="font-size: 12px;" t-if="label.product_id.currency_id.position == 'before'"
+                                   t-field="label.product_id.currency_id.symbol"/>
+                            <span style="font-size: 12px;background-color: transparent;padding: 0" class="" t-field="label.product_id.list_price" />
+                            <span style="font-size: 12px;" t-if="label.product_id.currency_id.position == 'after'"
+                                   t-field="label.product_id.currency_id.symbol"/>
+
+                        </t>
+                        <t t-if="label.product_id.name">
+                            <br/>
+                            <span style="font-size: 10px;background-color: transparent;padding: 0;margin-top: 0.5mm;" class="" t-field="label.product_id.name" />
+                        </t>
+                    </div>
+                </div>
+            </div>
+    </template>
+
+
+    <template id="report_product_label_57x35_template">
+        <t t-call="web.html_container">
+            <t t-set="barcode_size" t-value="'width:15.5mm;height:7mm'"/>
+            <t t-set="table_style" t-value="'width:100%;height:10mm;'"/>
+            <t t-set="padding_page" t-value="'padding: 1mm'"/>
+            <t t-set="count" t-value="0" />
+            <t t-call="web.basic_layout">
+                <div class="page">
+                    <div class="oe_structure"/>
+                    <t t-foreach="docs" t-as="label">
+                        <t t-set="qty" t-value="1" />
+                        <t t-if="label.qty">
+                            <t t-set="qty" t-value="label.qty" />
+                        </t>
+                        <t t-foreach="list(range(qty))" t-as="index_qty">
+                            <div t-if="count % 1 == 0" style="page-break-after:always;"/>
+                            <t t-call="custom_product_label.label_57x35"/>
+                            <t t-set="count" t-value="count+1" />
+                        </t>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>
