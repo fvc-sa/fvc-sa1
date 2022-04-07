@@ -6,42 +6,33 @@
                 <div class="o_label_full" t-att-style="table_style">
                     <div t-if="label.product_id.barcode" class="text-left o_label_small_barcode" style="float:left;">
                         <t t-if="label.wizard_id.humanreadable" t-set="show_code" t-value="1"/>
-                        <t t-else="" t-set="show_code" t-value="0" />
-                        <div class="text-center" t-out="label.product_id.barcode"
-                             style="padding:0;padding-left: -2mm;" t-options="{'widget': 'barcode', 'quiet': 0, 'symbology': 'auto', 'img_style': barcode_size}"/>
+                        <t t-else="" t-set="show_code" t-value="0"/>
+                        <div class="text-center" t-field="label.product_id.barcode" style="padding:0;padding-left: -2mm;" t-options="{'widget': 'barcode', 'quiet': 0, 'symbology': 'auto', 'img_style': barcode_size}"/>
                         <t t-if="show_code">
-                            <div class="o_label_name text-center"
-                                 style="padding:0;font-size: 8px;background-color: transparent;">
-                                <span class="text-center" t-out="label.product_id.barcode"/>
+                            <div class="o_label_name text-center" style="padding:0;font-size: 8px;background-color: transparent;">
+                                <span class="text-center" t-field="label.product_id.barcode"/>
                             </div>
                         </t>
                     </div>
-                    <div class="text-center "
-                         style="font-size: 12px;float:left; padding: 0;line-height:normal;padding-left: 2mm;padding-top: 1mm;">
+                    <div class="text-center " style="font-size: 12px;float:left; padding: 0;line-height:normal;padding-left: 2mm;padding-top: 1mm;">
                         <t t-if="label.product_id.x_studio_sales_price_vat">
-<!--                             <span style="font-size: 12px;" t-if="label.product_id.currency_id.position == 'before'"
-                                   t-field="label.product_id.currency_id.symbol"/> -->
-                            <span style="font-size: 12px;background-color: transparent;padding: 0" class="" t-field="label.product_id.x_studio_sales_price_vat" />
-<!--                             <span style="font-size: 12px;" t-if="label.product_id.currency_id.position == 'after'"
-                                  t-field="label.product_id.currency_id.symbol"/> -->
+                            <span style="font-size: 12px;background-color: transparent;padding: 0" class="" t-field="label.product_id.x_studio_sales_price_vat"/>
 
                         </t>
                         <t t-else="">
-                            <span style="font-size: 12px;" t-if="label.product_id.currency_id.position == 'before'"
-                                   t-field="label.product_id.currency_id.symbol"/>
-                            <span style="font-size: 12px;background-color: transparent;padding: 0" class="" t-field="label.product_id.lst_price" />
-                            <span style="font-size: 12px;" t-if="label.product_id.currency_id.position == 'after'"
-                                   t-field="label.product_id.currency_id.symbol"/>
+                            <span style="font-size: 12px;" t-if="label.product_id.currency_id.position == 'before'" t-field="label.product_id.currency_id.symbol"/>
+                            <span style="font-size: 12px;background-color: transparent;padding: 0" class="" t-field="label.product_id.lst_price"/>
+                            <span style="font-size: 12px;" t-if="label.product_id.currency_id.position == 'after'" t-field="label.product_id.currency_id.symbol"/>
 
                         </t>
                         <t t-if="label.product_id.x_studio_brand">
                             <br/>
-                            <span style="font-size: 10px;background-color: transparent;padding: 0;margin-top: 0.5mm;" class="" t-field="label.product_id.x_studio_brand" />
+                            <span style="font-size: 10px;background-color: transparent;padding: 0;margin-top: 0.5mm;" class="" t-field="label.product_id.x_studio_brand"/>
                         </t>
                     </div>
                 </div>
             </div>
-    </template>
+   </template>
 
 
     <template id="report_product_label_57x35_template">
