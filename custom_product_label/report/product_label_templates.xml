@@ -18,7 +18,15 @@
                     </div>
                     <div class="text-center "
                          style="font-size: 12px;float:left; padding: 0;line-height:normal;padding-left: 2mm;padding-top: 1mm;">
-                        <t t-if="label.product_id.is_product_variant">
+                        <t t-if="label.product_id.x_studio_sales_price_vat">
+                            <span style="font-size: 12px;" t-if="label.product_id.currency_id.position == 'before'"
+                                   t-field="label.product_id.currency_id.symbol"/>
+                            <span style="font-size: 12px;background-color: transparent;padding: 0" class="" t-field="label.product_id.x_studio_sales_price_vat" />
+                            <span style="font-size: 12px;" t-if="label.product_id.currency_id.position == 'after'"
+                                  t-field="label.product_id.currency_id.symbol"/>
+
+                        </t>
+                        <t t-else="label.product_id.is_product_variant">
                             <span style="font-size: 12px;" t-if="label.product_id.currency_id.position == 'before'"
                                    t-field="label.product_id.currency_id.symbol"/>
                             <span style="font-size: 12px;background-color: transparent;padding: 0" class="" t-field="label.product_id.lst_price" />
@@ -34,9 +42,9 @@
                                    t-field="label.product_id.currency_id.symbol"/>
 
                         </t>
-                        <t t-if="label.product_id.name">
+                        <t t-if="label.product_id.x_studio_brand">
                             <br/>
-                            <span style="font-size: 10px;background-color: transparent;padding: 0;margin-top: 0.5mm;" class="" t-field="label.product_id.name" />
+                            <span style="font-size: 10px;background-color: transparent;padding: 0;margin-top: 0.5mm;" class="" t-field="label.product_id.x_studio_brand" />
                         </t>
                     </div>
                 </div>
