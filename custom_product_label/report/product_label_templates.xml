@@ -22,8 +22,8 @@
 <!--                             <span style="font-size: 12px;" t-if="label.product_id.currency_id.position == 'before'"
                                    t-field="label.product_id.currency_id.symbol"/> -->
                             <span style="font-size: 12px;background-color: transparent;padding: 0" class="" t-field="label.product_id.x_studio_sales_price_vat" />
-                            <span style="font-size: 12px;" t-if="label.product_id.currency_id.position == 'after'"
-                                  t-field="label.product_id.currency_id.symbol"/>
+<!--                             <span style="font-size: 12px;" t-if="label.product_id.currency_id.position == 'after'"
+                                  t-field="label.product_id.currency_id.symbol"/> -->
 
                         </t>
                         <t t-else="">
